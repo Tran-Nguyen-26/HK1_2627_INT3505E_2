@@ -1,49 +1,32 @@
-# app.py — Bài 4: Path Parameters & Query Strings
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 
 app = Flask(__name__)
-app.json.ensure_ascii = False  # Hiển thị tiếng Việt nguyên bản
+app.json.ensure_ascii = False  # Hỗ trợ hiển thị tiếng Việt UTF-8
 
-# Dữ liệu mẫu
-BOOKS = [
-    {"id": "b1", "title": "Lập trình Python cơ bản", "price": 100},
-    {"id": "b2", "title": "Flask RESTful API từ A đến Z", "price": 150},
-    {"id": "b3", "title": "Chinh phục Python Nâng Cao", "price": 200},
-]
+# Giả lập Database đơn hàng
+ORDERS = {
+    "ord_01": {"id": "ord_01", "status": "pending", "item": "Laptop"},
+    "ord_02": {"id": "ord_02", "status": "shipped", "item": "Điện thoại"},
+}
 
-# 1. Query String: Bộ lọc, tìm kiếm, phân trang (/books?q=python&limit=10)
-@app.route("/books", methods=["GET"])
-def list_books():
-    limit = int(request.args.get("limit", 20))
-    offset = int(request.args.get("offset", 0))
-    q = request.args.get("q", "").strip().lower()
+# DELETE /orders/<order_id>
+@app.route("/orders/<order_id>", methods=["DELETE"])
+def delete_order(order_id):
+    order = ORDERS.get(order_id)
 
-    # Lọc danh sách theo từ khóa `q`
-    filtered = [b for b in BOOKS if q in b["title"].lower()]
-    
-    # Phân trang bằng cắt slice danh sách
-    items = filtered[offset : offset + limit]
+    # 404 Not Found — Không tìm thấy tài nguyên
+    if order is None:
+        return jsonify({"error": "Không tìm thấy đơn hàng"}), 404
 
-    return jsonify({
-        "total": len(filtered),
-        "items": items
-    }), 200
+    # 409 Conflict — Vi phạm quy tắc nghiệp vụ (đang/đã giao thì không cho xóa)
+    if order["status"] in ("shipped", "delivered"):
+        return jsonify({"error": "Không thể xóa đơn hàng đã giao hoặc đang vận chuyển"}), 409
 
-# 2. Path Parameter (String): Định danh tài nguyên cụ thể (/books/b1)
-@app.route("/books/<book_id>", methods=["GET"])
-def get_book(book_id):
-    # Tìm sách có id khớp với book_id trên URL
-    book = next((b for b in BOOKS if b["id"] == book_id), None)
-    
-    if book is None:
-        return jsonify({"error": "Không tìm thấy sách"}), 404
-        
-    return jsonify(book), 200
+    # Xóa đơn hàng khỏi cơ sở dữ liệu
+    ORDERS.pop(order_id, None)
 
-# 3. Path Parameter (Int Converter): Tự động ép kiểu URL sang int (/items/10)
-@app.route("/items/<int:item_id>", methods=["GET"])
-def get_item(item_id):
-    return jsonify({"id": item_id, "type": type(item_id).__name__}), 200
+    # 204 No Content — Xóa thành công, không trả về body
+    return "", 204
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
