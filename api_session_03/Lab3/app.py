@@ -92,7 +92,7 @@ def get_orders():
     status = request.args.get("status")
     if status:
         query = [o for o in query if o["status"] == status]
-        
+        fdsf
     customer_id = request.args.get("customer_id")
     if customer_id and customer_id.isdigit():
         query = [o for o in query if o["customer_id"] == int(customer_id)]
