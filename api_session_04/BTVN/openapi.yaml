@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: Tasks API
+  version: 1.0.0
+  description: Quản lý task nội bộ - title, status, priority, dueDate, assigneeId.
+servers:
+  - url: http://localhost:5000/v1
+    description: Local dev server
+tags:
+  - name: tasks
+    description: Các endpoint liên quan đến task
+paths:
+  /tasks:
+    get:
+      tags:
+        - tasks
+      operationId: listTasks
+      summary: Lấy danh sách tasks
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, in_progress, done]
+      responses:
+        '200':
+          description: Danh sách task
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags:
+        - tasks
+      operationId: createTask
+      summary: Tạo task mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskInput'
+      responses:
+        '201':
+          description: Tạo thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /tasks/{taskId}:
+    parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - tasks
+      operationId: getTaskById
+      summary: Lấy chi tiết task
+      responses:
+        '200':
+          description: Chi tiết task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+        - tasks
+      operationId: patchTask
+      summary: Cập nhật task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskInput'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - tasks
+      operationId: deleteTask
+      summary: Xoá task
+      responses:
+        '204':
+          description: Xoá thành công, không trả về body
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    Task:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: "Làm bài tập SOA"
+        status:
+          type: string
+          enum: [open, in_progress, done]
+          default: open
+        priority:
+          type: string
+          enum: [low, normal, high]
+          default: normal
+        dueDate:
+          type: string
+          format: date
+          example: "2026-10-18"
+        assigneeId:
+          type: string
+          format: uuid
+    CreateTaskInput:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        priority:
+          type: string
+          enum: [low, normal, high]
+        dueDate:
+          type: string
+          format: date
+        assigneeId:
+          type: string
+          format: uuid
+    UpdateTaskInput:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: string
+          enum: [open, in_progress, done]
+        priority:
+          type: string
+          enum: [low, normal, high]
+
+    Error:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+
+  responses:
+    NotFound:
+      description: Không tìm thấy resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Chưa xác thực
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ValidationError:
+      description: Lỗi validate dữ liệu đầu vào
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
