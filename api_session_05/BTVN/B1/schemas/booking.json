@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Booking",
+  "type": "object",
+  "required": ["id", "userId", "roomId", "checkInDate", "checkOutDate", "totalPrice", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ord_[a-z0-9]+$",
+      "description": "Mã định danh đơn đặt phòng"
+    },
+    "userId": {
+      "type": "string",
+      "pattern": "^user_[a-z0-9]+$",
+      "description": "Mã khách hàng thực hiện đặt phòng"
+    },
+    "roomId": {
+      "type": "string",
+      "pattern": "^room_[a-z0-9]+$",
+      "description": "Mã phòng được đặt"
+    },
+    "checkInDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Ngày nhận phòng (YYYY-MM-DD)"
+    },
+    "checkOutDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Ngày trả phòng (YYYY-MM-DD)"
+    },
+    "totalPrice": {
+      "$ref": "#/$defs/price",
+      "description": "Tổng chi phí đặt phòng"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "confirmed", "cancelled", "completed"],
+      "description": "Trạng thái đơn hàng"
+    }
+  },
+  "$defs": {
+    "price": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["VND", "USD"]
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

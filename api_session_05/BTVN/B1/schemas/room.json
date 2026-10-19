@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Room",
+  "type": "object",
+  "required": ["id", "hotelId", "roomNumber", "pricePerNight", "isAvailable"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^room_[a-z0-9]+$",
+      "description": "Mã định danh phòng"
+    },
+    "hotelId": {
+      "type": "string",
+      "pattern": "^hotel_[a-z0-9]+$",
+      "description": "Mã khách sạn chứa phòng này"
+    },
+    "roomNumber": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Số hiệu phòng"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["single", "double", "deluxe", "suite"],
+      "description": "Loại phòng"
+    },
+    "pricePerNight": {
+      "$ref": "#/$defs/price",
+      "description": "Giá phòng mỗi đêm"
+    },
+    "isAvailable": {
+      "type": "boolean",
+      "description": "Trạng thái sẵn sàng cho thuê"
+    }
+  },
+  "$defs": {
+    "price": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Giá trị số nguyên của số tiền"
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["VND", "USD"],
+          "description": "Đơn vị tiền tệ"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
