@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: Social Network API
+  version: 1.0.0
+  description: API phục vụ mạng xã hội với cơ chế xác thực JWT và phân quyền.
+paths:
+  /auth/login:
+    post:
+      summary: Xác thực người dùng và cấp JWT
+      description: Endpoint này không yêu cầu scope. Trả về access token và refresh token nếu thành công.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: an@vnu.edu.vn
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Đăng nhập thành công. Trả về token.[cite: 16]
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+                  refresh:
+                    type: string
+        '401':
+          description: Sai thông tin đăng nhập (invalid_credentials).[cite: 16]
+
+  /auth/refresh:
+    post:
+      summary: Cấp lại Access Token mới
+      description: Yêu cầu sử dụng Refresh Token. Không yêu cầu scope.
+      security:
+        - bearerRefresh: []
+      responses:
+        '200':
+          description: Cấp token thành công.[cite: 17]
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+        '401':
+          description: Refresh token hết hạn, không hợp lệ, hoặc đã bị thu hồi.[cite: 17]
+
+  /posts/{id}:
+    get:
+      summary: Lấy thông tin bài viết
+      description: Yêu cầu xác thực bằng Access Token và kiểm tra quyền sở hữu đối tượng.
+      security:
+        - bearerAuth:
+            - "posts:read"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Trả về chi tiết bài viết.
+        '401':
+          description: Thiếu token hoặc token không hợp lệ/hết hạn.[cite: 17]
+        '403':
+          description: Lỗi forbidden hoặc insufficient_scope. Có thể do thiếu scope "posts:read"[cite: 25] hoặc không có quyền truy cập đối tượng này (lỗi BOLA)[cite: 26].
+        '404':
+          description: Không tìm thấy bài viết (nf).[cite: 26]
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Sử dụng Access Token ngắn hạn.
+    bearerRefresh:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Sử dụng Refresh Token dài hạn.
