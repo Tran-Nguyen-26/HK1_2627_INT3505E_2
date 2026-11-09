@@ -1,0 +1,6 @@
+flask
+flask-sqlalchemy
+flask-migrate
+marshmallow
+gunicorn
+psycopg2-binary
