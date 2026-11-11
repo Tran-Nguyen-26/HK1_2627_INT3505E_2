@@ -10,9 +10,8 @@ def test_get_books_empty(client):
     assert len(data) == 0
 
 def test_get_book_not_found(client):
-    """B. GET /books/<id> với id không tồn tại trả về 400 (hoặc 404 tùy API) + JSON chứa 'code' hoặc tương đương"""
+    """B. GET /books/<id> với id không tồn tại trả về 400/404 + JSON chứa thông tin lỗi"""
     response = client.get('/books/non_existent_id_999')
-    # API thực tế đang trả về status code 400 cho ID không hợp lệ/không tồn tại này
     assert response.status_code in [400, 404]
     data = response.get_json()
     assert data is not None
@@ -24,7 +23,6 @@ def test_post_books_missing_title(client):
     data = response.get_json()
     assert 'errors' in data
     
-    # Kiểm tra errors ở dạng list chứa dict (ví dụ: [{'field': 'title', ...}])
     errors = data['errors']
     if isinstance(errors, list):
         fields = [err.get('field') for err in errors]
@@ -33,7 +31,7 @@ def test_post_books_missing_title(client):
         assert 'title' in errors
 
 def test_delete_then_get(client):
-    """D. Xoá rồi GET cùng id — phải trả về 404 (hoặc 400)"""
+    """D. Xoá rồi GET cùng id — phải trả về lỗi không tìm thấy (400/404)"""
     create_res = client.post('/books', json={"title": "Book to Delete", "author": "Author"})
     book = create_res.get_json()
     book_id = book.get('id') or book.get('data', {}).get('id')
@@ -45,7 +43,7 @@ def test_delete_then_get(client):
     assert get_res.status_code in [400, 404]
 
 def test_response_extra_field_blocked(client):
-    """Bonus: Dùng jsonschema kiểm tra cấu trúc response của sách"""
+    """Bước 2, Bonus: Dùng jsonschema chứng minh backend không lộ password_hash hoặc field lạ"""
     create_res = client.post('/books', json={"title": "Secure Book", "author": "Author"})
     book = create_res.get_json()
     book_id = book.get('id') or book.get('data', {}).get('id')
@@ -54,7 +52,10 @@ def test_response_extra_field_blocked(client):
     assert response.status_code == 200
     data = response.get_json()
 
-    # Bổ sung các field thực tế mà API trả về (id, title, author, isbn, year)
+    # Chứng minh tường minh rằng không lộ password_hash trong response
+    assert "password_hash" not in data, "Phát hiện lộ password_hash trong response!"
+
+    # Định nghĩa schema chặn các trường ngoài lề không cho phép (additionalProperties: False)
     schema = {
         "type": "object",
         "properties": {
@@ -71,4 +72,4 @@ def test_response_extra_field_blocked(client):
     try:
         validate(instance=data, schema=schema)
     except ValidationError as e:
-        pytest.fail(f"Schema validation failed: {e}")
+        pytest.fail(f"Phát hiện trường dữ liệu lạ bị lộ hoặc vi phạm schema: {e}")
