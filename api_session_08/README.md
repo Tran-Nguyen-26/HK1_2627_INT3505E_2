@@ -7,3 +7,8 @@ Kết quả khi chạy 4 test trong bước 1
 Bước 2
 
 ![alt text](image-3.png)
+
+
+Lab2
+
+![alt text](image-4.png)

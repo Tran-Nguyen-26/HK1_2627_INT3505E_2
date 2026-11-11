@@ -1,0 +1,9 @@
+extends: [spectral:oas]
+rules:
+  response-200-has-properties:
+    description: "Response 200 phải có schema và chứa các thuộc tính (properties) cụ thể."
+    severity: warn
+    given: "$.paths[*].[get,post,put,delete].responses['200'].content[*].schema"
+    then:
+      field: properties
+      function: truthy
