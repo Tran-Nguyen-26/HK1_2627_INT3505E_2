@@ -29,3 +29,28 @@ newman run books-api.postman_collection.json -e staging.postman_environment.json
 Kết quả:
 
 ![alt text](image-5.png)
+
+
+Lab4
+
+- Viết thêm task `search_by_year(year)` trong `performance/locustfile.py` có giả lập 1% fail rate.
+- Chạy 3 kịch bản load test:
+  - **Kịch bản A (baseline)**: 10 users, spawn rate 2/s, thời gian 30s -> `reports/A.html`
+  - **Kịch bản B (load test)**: 50 users, spawn rate 5/s, thời gian 60s -> `reports/B.html`
+  - **Kịch bản C (spike test)**: 200 users, spawn rate 50/s, thời gian 30s -> `reports/C.html`
+
+Bảng kết quả đo:
+
+- Kịch bản A:
+
+![alt text](image-6.png)
+
+- Kịch bản B:
+
+![alt text](image-7.png)
+
+- Kịch bản C:
+
+![alt text](image-8.png)
+
+Chi tiết phân tích các câu hỏi xem trong file [performance/analysis.md](lab08-starter/performance/analysis.md).
