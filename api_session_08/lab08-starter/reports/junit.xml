@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Books API — Lab08 Starter" tests="7" time="0.081">
+  <testsuite name="books / GET /books — initial list" id="3eaa7c62-ebb6-4d35-b059-40a932d3b554" timestamp="2026-11-15T02:41:53.480Z" tests="2" failures="0" errors="0" time="0.027">
+    <testcase name="200 OK" time="0.027" classname="BooksGetBooksInitialList"/>
+    <testcase name="body is array" time="0.027" classname="BooksGetBooksInitialList"/>
+  </testsuite>
+  <testsuite name="books / POST /books — create" id="3f93a2dc-aef7-425f-b8a4-878ee6082f5a" timestamp="2026-11-15T02:41:53.480Z" tests="2" failures="0" errors="0" time="0.019">
+    <testcase name="201 Created" time="0.019" classname="BooksPostBooksCreate"/>
+    <testcase name="positive id" time="0.019" classname="BooksPostBooksCreate"/>
+  </testsuite>
+  <testsuite name="books / GET /books/{id} — read" id="23491754-9c23-4983-a1ac-aa4c4fc9a3f2" timestamp="2026-11-15T02:41:53.480Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="200 OK" time="0.007" classname="BooksGetBooksIdRead"/>
+    <testcase name="expected fields" time="0.007" classname="BooksGetBooksIdRead"/>
+  </testsuite>
+  <testsuite name="books / PUT /books/{id} — replace" id="bb8a13e9-1f43-4f6b-b815-a35006fbe0b0" timestamp="2026-11-15T02:41:53.480Z" tests="2" failures="0" errors="0" time="0.010">
+    <testcase name="200 OK" time="0.010" classname="BooksPutBooksIdReplace"/>
+    <testcase name="updated title" time="0.010" classname="BooksPutBooksIdReplace"/>
+  </testsuite>
+  <testsuite name="books / DELETE /books/{id} — delete" id="b24b1bc9-b428-457f-9771-259a925f75e2" timestamp="2026-11-15T02:41:53.480Z" tests="2" failures="0" errors="0" time="0.008">
+    <testcase name="204 No Content" time="0.008" classname="BooksDeleteBooksIdDelete"/>
+    <testcase name="empty body" time="0.008" classname="BooksDeleteBooksIdDelete"/>
+  </testsuite>
+  <testsuite name="error-cases / POST /books (missing title)" id="92639030-6a87-4756-8434-7a5358412502" timestamp="2026-11-15T02:41:53.480Z" tests="3" failures="0" errors="0" time="0.004">
+    <testcase name="Status code is 400 Bad Request" time="0.004" classname="ErrorCasesPostBooksMissingTitle"/>
+    <testcase name="Response body code is VALIDATION_ERROR" time="0.004" classname="ErrorCasesPostBooksMissingTitle"/>
+    <testcase name="Validation error specifies missing title" time="0.004" classname="ErrorCasesPostBooksMissingTitle"/>
+  </testsuite>
+  <testsuite name="error-cases / GET /books/9999" id="174f160d-5f8e-44ab-873e-7152d06f5216" timestamp="2026-11-15T02:41:53.480Z" tests="3" failures="0" errors="0" time="0.006">
+    <testcase name="Status code is 404 Not Found" time="0.006" classname="ErrorCasesGetBooks9999"/>
+    <testcase name="Response body code is NOT_FOUND" time="0.006" classname="ErrorCasesGetBooks9999"/>
+    <testcase name="Error message indicates book not found" time="0.006" classname="ErrorCasesGetBooks9999"/>
+  </testsuite>
+</testsuites>
